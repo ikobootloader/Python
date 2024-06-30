@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Article Submission</title>
+</head>
+<body>
+    <h1>Submit an Article</h1>
+    <textarea id="content" rows="10" cols="50"></textarea>
+    <button onclick="submitArticle()">Submit</button>
+    
+    <h1>Add Word to Ignore List</h1>
+    <input type="text" id="ignored_word" placeholder="Word to ignore">
+    <button onclick="addIgnoredWord()">Add Word</button>
+    
+    <h1>Remove Word from Ignore List</h1>
+    <input type="text" id="remove_word" placeholder="Word to remove">
+    <button onclick="removeIgnoredWord()">Remove Word</button>
+
+    <h1>Analyze Articles</h1>
+    <button onclick="analyzeArticles()">Analyze</button>
+    <img id="graph" src="" alt="Graphe des Noms Communs">
+
+    <script>
+        const serverUrl = 'http://127.0.0.1:5001';  // Assurez-vous que c'est l'URL correcte du serveur Flask
+
+        function submitArticle() {
+            const content = document.getElementById('content').value;
+            fetch(`${serverUrl}/add_article`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function addIgnoredWord() {
+            const word = document.getElementById('ignored_word').value;
+            fetch(`${serverUrl}/add_ignored_word`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ word })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function removeIgnoredWord() {
+            const word = document.getElementById('remove_word').value;
+            fetch(`${serverUrl}/remove_ignored_word`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ word })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        }
+
+        function analyzeArticles() {
+            fetch(`${serverUrl}/analyze`)
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                document.getElementById('graph').src = `${serverUrl}/static/graph.png`;
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
