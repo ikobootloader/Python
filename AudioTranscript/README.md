@@ -1,1 +1,1 @@
-Permet de transcrire de l'audio en texte
+Permet de transcrire l'audio d'une vidéo en texte
