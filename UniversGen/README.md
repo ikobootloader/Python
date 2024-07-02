@@ -1,6 +1,6 @@
 Simule un Univers en expansion avec effets gravitationnels. <br/>
 Nécessite des ressources systèmes importantes.
-<br/>
+<br/><br/>
 Éléments de l'Interface Utilisateur :<br/>
 <br/>
 Bouton "Pause" pour mettre en pause ou reprendre la simulation.<br/>
