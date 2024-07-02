@@ -1,15 +1,19 @@
 import pygame
+import pygame_gui
 import numpy as np
 import sys
 import random
 
-# Initialisation de Pygame
+# Initialisation de Pygame et Pygame GUI
 pygame.init()
 
 # Dimensions de la fenêtre
-width, height = 800, 600
+width, height = 1000, 700
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Simulation de l\'Univers')
+
+# Gestionnaire d'interface utilisateur
+manager = pygame_gui.UIManager((width, height))
 
 # Couleurs
 BLACK = (0, 0, 0)
@@ -36,7 +40,7 @@ def scale_factor(t, H0, Omega_m, Omega_lambda):
     return a
 
 # Création d'un ensemble de galaxies aléatoires
-num_galaxies = 1000
+num_galaxies = 50  # Réduire le nombre pour améliorer les performances
 galaxies = np.random.rand(num_galaxies, 2) * 2 - 1  # Coordonnées x, y entre -1 et 1
 galaxy_colors = [WHITE for _ in range(num_galaxies)]
 selected_galaxy = None
@@ -58,30 +62,56 @@ def gravitational_force(pos1, pos2):
     F = G / r**2
     return F * (pos2 - pos1) / r
 
+# Optimisation des calculs gravitationnels
+def calculate_forces(galaxies):
+    forces = np.zeros_like(galaxies)
+    for i in range(num_galaxies):
+        for j in range(i + 1, num_galaxies):
+            force = gravitational_force(galaxies[i], galaxies[j])
+            forces[i] += force
+            forces[j] -= force  # La force est symétrique
+    return forces
+
+# Ajout des éléments de l'interface utilisateur
+pause_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((10, 10), (100, 50)),
+                                            text='Pause',
+                                            manager=manager)
+speed_slider = pygame_gui.elements.UIHorizontalSlider(relative_rect=pygame.Rect((120, 10), (200, 50)),
+                                                      start_value=1.0,
+                                                      value_range=(0.1, 10.0),
+                                                      manager=manager)
+zoom_slider = pygame_gui.elements.UIHorizontalSlider(relative_rect=pygame.Rect((330, 10), (200, 50)),
+                                                     start_value=1.0,
+                                                     value_range=(0.1, 10.0),
+                                                     manager=manager)
+supernova_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((540, 10), (100, 50)),
+                                                text='Supernova',
+                                                manager=manager)
+
 # Boucle principale
 running = True
 paused = False
 
 while running:
+    time_delta = pygame.time.Clock().tick(60)/1000.0
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                paused = not paused
-            elif event.key == pygame.K_UP:
-                dt *= 2  # Augmenter la vitesse
-            elif event.key == pygame.K_DOWN:
-                dt /= 2  # Diminuer la vitesse
-            elif event.key == pygame.K_PLUS or event.key == pygame.K_EQUALS:
-                zoom_factor *= 1.1  # Zoomer
-            elif event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
-                zoom_factor /= 1.1  # Dézoomer
-            elif event.key == pygame.K_s:
-                # Déclencher une supernova aléatoire
-                random_index = random.randint(0, num_galaxies - 1)
-                trigger_supernova(random_index)
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.USEREVENT:
+            if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == pause_button:
+                    paused = not paused
+                if event.ui_element == supernova_button:
+                    random_index = random.randint(0, num_galaxies - 1)
+                    trigger_supernova(random_index)
+            if event.user_type == pygame_gui.UI_HORIZONTAL_SLIDER_MOVED:
+                if event.ui_element == speed_slider:
+                    dt = event.value
+                if event.ui_element == zoom_slider:
+                    zoom_factor = event.value
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:  # Sélectionner une galaxie avec le bouton gauche de la souris
                 mouse_x, mouse_y = event.pos
                 for i, galaxy in enumerate(galaxies):
@@ -109,6 +139,8 @@ while running:
         elif event.type >= pygame.USEREVENT and event.type < pygame.USEREVENT + num_galaxies:
             end_supernova(event.type - pygame.USEREVENT)
 
+        manager.process_events(event)
+
     if not paused:
         # Mise à jour du temps
         t += dt
@@ -120,15 +152,8 @@ while running:
         screen.fill(BLACK)
 
         # Mise à jour des positions des galaxies
-        new_positions = np.copy(galaxies)
-        for i in range(num_galaxies):
-            net_force = np.array([0.0, 0.0])
-            for j in range(num_galaxies):
-                if i != j:
-                    net_force += gravitational_force(galaxies[i], galaxies[j])
-            acceleration = net_force  # Accélération due à la force gravitationnelle
-            new_positions[i] += acceleration * dt**2  # Mise à jour de la position
-        galaxies = new_positions
+        forces = calculate_forces(galaxies)
+        galaxies += forces * dt**2  # Mise à jour des positions
 
         # Affichage des galaxies
         for i, galaxy in enumerate(galaxies):
@@ -136,10 +161,12 @@ while running:
             y = int(height / 2 + galaxy[1] * height / 2 * a * zoom_factor)
             pygame.draw.circle(screen, galaxy_colors[i], (x, y), 2)
 
-        # Mise à jour de l'affichage
-        pygame.display.flip()
+    # Mise à jour de l'interface utilisateur
+    manager.update(time_delta)
+    manager.draw_ui(screen)
 
-    pygame.time.delay(50)  # Délai pour ralentir l'animation
+    # Mise à jour de l'affichage
+    pygame.display.flip()
 
 pygame.quit()
 sys.exit()
