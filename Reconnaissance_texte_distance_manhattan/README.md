@@ -9,24 +9,24 @@ L'objectif de l'algorithme est de propager la valeur de la récompense (notée $
 Pour chaque état $V_e$ dans $T$, tant que $V_e$ n'est pas égal à la récompense $\mathbb{Z}$, la mise à jour se fait selon les conditions suivantes :
 
 1. **Si $y \leq R(y)$ et $x \leq R(x)$** :
-   $$
+   $
    (R(y) - y, R(x) - x) = \gamma^{x+y}
-$$
+$
 
 2. **Si $y \leq R(y)$ et $x \leq \text{argmax}(x) - R(x)$** :
-   $$
+   $
    (R(y) - y, R(x) + x) = \gamma^{x+y}
-$$
+$
 
 3. **Si $y \leq \text{argmax}(y) - R(y)$ et $x \leq R(x)$** :
-   $$
+   $
    (R(y) + y, R(x) - x) = \gamma^{x+y}
-$$
+$
 
 4. **Si $y \leq \text{argmax}(y) - R(y)$ et $x \leq \text{argmax}(x) - R(x)$** :
-   $$
+   $
    (R(y) + y, R(x) + x) = \gamma^{x+y}
-$$
+$
 
 ### Équation Générale
 
