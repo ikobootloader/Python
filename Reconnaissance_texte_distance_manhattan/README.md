@@ -9,24 +9,16 @@ L'objectif de l'algorithme est de propager la valeur de la récompense (notée $
 Pour chaque état $V_e$ dans $T$, tant que $V_e$ n'est pas égal à la récompense $\mathbb{Z}$, la mise à jour se fait selon les conditions suivantes :
 
 1. **Si $y \leq R(y)$ et $x \leq R(x)$** :
-   $
-   (R(y) - y, R(x) - x) = \gamma^{x+y}
-$
+   $(R(y) - y, R(x) - x) = \gamma^{x+y}$
 
 2. **Si $y \leq R(y)$ et $x \leq \text{argmax}(x) - R(x)$** :
-   $
-   (R(y) - y, R(x) + x) = \gamma^{x+y}
-$
+   $(R(y) - y, R(x) + x) = \gamma^{x+y}$
 
 3. **Si $y \leq \text{argmax}(y) - R(y)$ et $x \leq R(x)$** :
-   $
-   (R(y) + y, R(x) - x) = \gamma^{x+y}
-$
+   $(R(y) + y, R(x) - x) = \gamma^{x+y}$
 
 4. **Si $y \leq \text{argmax}(y) - R(y)$ et $x \leq \text{argmax}(x) - R(x)$** :
-   $
-   (R(y) + y, R(x) + x) = \gamma^{x+y}
-$
+   $(R(y) + y, R(x) + x) = \gamma^{x+y}$
 
 ### Équation Générale
 
@@ -80,17 +72,17 @@ $$
 $$
 
 2. **Calcul de la contribution de la deuxième récompense** :
-   $$
+   $
    d_2 = |3 - 5| + |4 - 6| = 2 + 2 = 4
-$$
-   $$
+$
+   $
    \text{Contribution de } \mathbb{Z}_2 = \gamma^4 \cdot 30 = 0.9^4 \cdot 30 = 0.6561 \cdot 30 = 19.683
-$$
+$
 
 3. **Calcul de la valeur totale $V_e(x, y)$** :
-   $$
+   $
    V_e(3, 4) = 40.5 + 19.683 = 60.183
-$$
+$
 
 ### Résultat
 
@@ -103,6 +95,4 @@ Cette approche permet de prendre en compte plusieurs récompenses et leurs effet
 ***
 
 Il serait possible d'utiliser ce procédé pour faire de la reconnaissance de texte : chaque point de récompense représente un pixel par exemple d'une lettre manuscrite. La lettre peut être écrite de différente manière, il faudrait "entraîner" notre matrice de récompenses (avec un calcul de densité de présence corrélée à la quantité de cas d'entraînement) dont les variations de la propagation de γ créeraient des zones qui seraient tantôt plus chaudes (correspondantes à une probabilité d'apparition élevée d'un pixel de la lettre) et donc plus froides à mesure que l'on s'éloigne d'elles.
-Ici, $\gamma^{|x - R(x)| + |y - R(y)|}$ représente la diminution de la valeur de la récompense à mesure que l'on s'éloigne du point $(R(x), R(y))$, et $\mathbb{Z}$ est la valeur maximale de la récompense au point $(R(x), R(y))$.
 
-Ce modèle assume que l'agent suit des règles de propagation selon la distance en termes de coordonnées cartésiennes par rapport au point de récompense, avec une décroissance exponentielle déterminée par $\gamma$.
