@@ -24,9 +24,7 @@ Pour chaque état $V_e$ dans $T$, tant que $V_e$ n'est pas égal à la récompen
 
 À partir de ces règles, l'équation générale pour la valeur d'état $V_e$ peut être écrite comme une fonction de la distance par rapport au point de récompense $(R(x), R(y))$, pondérée par le facteur d'escompte $\gamma$. Si l'on généralise les conditions :
 
-$$
-V_e(x, y) = \gamma^{|x - R(x)| + |y - R(y)|} \cdot \mathbb{Z}
-$$
+$V_e(x, y) = \gamma^{|x - R(x)| + |y - R(y)|} \cdot \mathbb{Z}$
 
 ***
 
@@ -40,9 +38,7 @@ La valeur d'état $V_e(x, y)$ en un point $(x, y)$ sera alors la somme des contr
 
 L'équation générale devient :
 
-$$
-V_e(x, y) = \sum_{i=1}^{n} \gamma^{|x - R_i(x)| + |y - R_i(y)|} \cdot \mathbb{Z}_i
-$$
+$V_e(x, y) = \sum_{i=1}^{n} \gamma^{|x - R_i(x)| + |y - R_i(y)|} \cdot \mathbb{Z}_i$
 
 ### Explication
 
@@ -64,25 +60,15 @@ Supposons que :
 **Étapes** :
 
 1. **Calcul de la contribution de la première récompense** :
-   $$
-   d_1 = |3 - 2| + |4 - 3| = 1 + 1 = 2
-$$
-   $$
-   \text{Contribution de } \mathbb{Z}_1 = \gamma^2 \cdot 50 = 0.9^2 \cdot 50 = 0.81 \cdot 50 = 40.5
-$$
+   $d_1 = |3 - 2| + |4 - 3| = 1 + 1 = 2$
+   $\text{Contribution de } \mathbb{Z}_1 = \gamma^2 \cdot 50 = 0.9^2 \cdot 50 = 0.81 \cdot 50 = 40.5$
 
 2. **Calcul de la contribution de la deuxième récompense** :
-   $
-   d_2 = |3 - 5| + |4 - 6| = 2 + 2 = 4
-$
-   $
-   \text{Contribution de } \mathbb{Z}_2 = \gamma^4 \cdot 30 = 0.9^4 \cdot 30 = 0.6561 \cdot 30 = 19.683
-$
+   $d_2 = |3 - 5| + |4 - 6| = 2 + 2 = 4$
+   $\text{Contribution de } \mathbb{Z}_2 = \gamma^4 \cdot 30 = 0.9^4 \cdot 30 = 0.6561 \cdot 30 = 19.683$
 
 3. **Calcul de la valeur totale $V_e(x, y)$** :
-   $
-   V_e(3, 4) = 40.5 + 19.683 = 60.183
-$
+   $V_e(3, 4) = 40.5 + 19.683 = 60.183$
 
 ### Résultat
 
