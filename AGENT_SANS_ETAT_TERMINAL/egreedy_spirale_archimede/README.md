@@ -2,7 +2,7 @@ Pour modéliser le mouvement de l'agent en suivant une spirale d'Archimède sur 
 
 Pour un déplacement en coordonnées cartésiennes, on peut utiliser les équations suivantes :
 
-$x(\theta) = (a + b\theta) \cdot \cos(\theta)$
+$x(\theta) = (a + b\theta) \cdot \cos(\theta)$ <br/>
 $y(\theta) = (a + b\theta) \cdot \sin(\theta)$
 
 Cependant, dans le cas d'un mouvement en grille comme dans l'image, on doit adapter cette approche à un système de grille cartésien où l'agent se déplace par des étapes discrètes (unité par unité).
