@@ -1,0 +1,26 @@
+# Structure du projet avec les fichiers originaux:
+lotto_prediction/
+│
+├── config/
+│   ├── __init__.py
+│   └── settings.py        # Configurations MLConfig et ValidationConfig
+│
+├── src/
+│   ├── __init__.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   └── model_factory.py
+│   └── post_processing/   # Nouveau module
+│       ├── __init__.py
+│       └── prediction_processor.py
+│
+├── data/
+│   └── dataset.csv        # Votre fichier de données
+│
+├── partie_1.py            # Votre code existant (LottoDataAnalyzer)
+├── partie_2.py            # Votre code existant (LottoOptimizer)
+├── partie_3A.py           # Votre code existant (LottoValidator)
+├── partie_3B.py           # Votre code existant (FeatureExtractor, LSTMPredictor)
+├── systeme.py            # Votre code existant (LottoPredictionSystem)
+├── main.py               # Point d'entrée principal
+└── requirements.txt      # Dépendances du projet
