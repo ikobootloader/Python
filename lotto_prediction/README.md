@@ -1,4 +1,4 @@
-# Guide Développeur : Système de Prédiction Lotto
+# Guide Développeur : Système de Prédiction (Type Loto)
 
 ## Table des matières
 1. [Introduction](#introduction)
