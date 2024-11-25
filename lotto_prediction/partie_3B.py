@@ -193,21 +193,15 @@ class LSTMPredictor(nn.Module):
         self.config = config
         self.temperature = 0.5
         self.input_size = input_size
-        
-        # Dimensions de base
         self.hidden_size = config.hidden_size
         
-        # Normalisation de l'entrée
-        self.input_norm = nn.BatchNorm1d(input_size)
-        
-        # Projection de l'entrée
+        # Remove BatchNorm1d for single sample prediction
         self.input_projection = nn.Sequential(
             nn.Linear(input_size, self.hidden_size),
             nn.ReLU(),
             nn.Dropout(config.dropout)
         )
         
-        # LSTM principal
         self.lstm = nn.LSTM(
             input_size=self.hidden_size,
             hidden_size=self.hidden_size,
@@ -217,10 +211,8 @@ class LSTMPredictor(nn.Module):
             bidirectional=True
         )
         
-        # Dimension de sortie du LSTM (x2 car bidirectionnel)
         lstm_output_size = self.hidden_size * 2
         
-        # Attention layer
         self.attention = nn.MultiheadAttention(
             embed_dim=lstm_output_size,
             num_heads=8,
@@ -228,32 +220,27 @@ class LSTMPredictor(nn.Module):
             batch_first=True
         )
         
-        # Couche de réduction de dimension post-attention
         self.post_attention = nn.Sequential(
             nn.Linear(lstm_output_size, self.hidden_size),
             nn.ReLU(),
             nn.Dropout(config.dropout)
         )
         
-        # Réseau pour les numéros principaux
+        # Remove BatchNorm from prediction heads
         self.main_numbers_head = nn.Sequential(
             nn.Linear(self.hidden_size, self.hidden_size),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.BatchNorm1d(self.hidden_size),
             nn.Linear(self.hidden_size, self.hidden_size),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.BatchNorm1d(self.hidden_size),
             nn.Linear(self.hidden_size, 5 * 49)
         )
         
-        # Réseau pour le numéro chance
         self.bonus_number_head = nn.Sequential(
             nn.Linear(self.hidden_size, self.hidden_size // 2),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.BatchNorm1d(self.hidden_size // 2),
             nn.Linear(self.hidden_size // 2, 10)
         )
         
@@ -273,39 +260,25 @@ class LSTMPredictor(nn.Module):
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         batch_size = x.size(0)
         
-        # Assurer la dimension de séquence
         if len(x.size()) == 2:
             x = x.unsqueeze(1)
         
-        # Normalisation de l'entrée
-        x_flat = x.reshape(-1, self.input_size)
-        x_norm = self.input_norm(x_flat)
-        x = x_norm.reshape(batch_size, -1, self.input_size)
-        
-        # Projection initiale
+        # Direct projection without normalization
         x = self.input_projection(x.view(-1, self.input_size))
         x = x.view(batch_size, -1, self.hidden_size)
         
-        # LSTM
         lstm_out, _ = self.lstm(x)
-        
-        # Self-attention
         attn_out, _ = self.attention(lstm_out, lstm_out, lstm_out)
-        
-        # Réduction de dimension
         features = self.post_attention(attn_out[:, -1])
         
-        # Prédiction des numéros principaux
         main_logits = self.main_numbers_head(features)
         main_logits = main_logits.reshape(batch_size, 5, 49) / self.temperature
         
-        # Prédiction du numéro chance
         bonus_logits = self.bonus_number_head(features) / self.temperature
         
         return main_logits, bonus_logits
 
     def adjust_temperature(self, new_temp: float):
-        """Ajuste la température du softmax."""
         self.temperature = max(0.1, min(1.0, new_temp))
         
     def predict_proba(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
